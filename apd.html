@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Port Scanner | SiteSentinel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { 
+            background-color: #0f172a; 
+            background-image: 
+                linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.95)), 
+                url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #f8fafc; 
+            font-family: 'Inter', sans-serif; 
+        }
+        
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .terminal { background: #050505; border: 1px solid #333; font-family: 'Courier New', Courier, monospace; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center pt-24 pb-12 px-4 relative">
+
+    <nav class="fixed top-0 left-0 w-full bg-slate-900/80 backdrop-blur-md z-50 px-6 py-4 flex justify-between items-center border-b border-slate-700/50">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
+            <i class="fa-solid fa-shield-halved text-blue-500 text-2xl"></i>
+            <span class="text-xl font-bold text-white tracking-wide">Site<span class="text-blue-500">Sentinel</span></span>
+        </div>
+        <div class="flex gap-6 text-sm font-semibold text-slate-300 items-center">
+            <a href="index.html" class="hover:text-blue-400 transition-colors"><i class="fa-solid fa-radar mr-1"></i> Scanner</a>
+            <a href="threats.html" class="hover:text-blue-400 transition-colors"><i class="fa-solid fa-book-skull mr-1"></i> Dictionary</a>
+            <span class="text-emerald-400"><i class="fa-solid fa-network-wired mr-1"></i> Port Scan</span>
+        </div>
+    </nav>
+
+    <div class="text-center max-w-2xl w-full mb-10 space-y-4">
+        <h1 class="text-5xl font-bold tracking-tight text-white">
+            <i class="fa-solid fa-door-open text-emerald-500 mr-3"></i>Port <span class="text-emerald-500">Scanner</span>
+        </h1>
+        <p class="text-slate-400 text-lg">Actively probe a target for open network ports and vulnerable services.</p>
+    </div>
+
+    <div class="max-w-2xl w-full glass rounded-2xl p-4 shadow-2xl flex gap-4 items-center relative z-20 mb-8">
+        <div class="flex-1 relative">
+            <i class="fa-solid fa-server absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500"></i>
+            <input type="text" id="targetIp" placeholder="Enter Domain or IP (e.g., example.com)" 
+                class="w-full bg-slate-900 border border-slate-700 rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-emerald-500 transition-all font-mono">
+        </div>
+        <button onclick="runPortScan()" id="portScanBtn"
+            class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg shadow-emerald-500/20 whitespace-nowrap">
+            <i class="fa-solid fa-bolt mr-2"></i> PROBE
+        </button>
+    </div>
+
+    <div class="max-w-3xl w-full terminal rounded-xl p-6 shadow-2xl overflow-hidden hidden" id="terminalBox">
+        <div class="flex gap-2 mb-4 border-b border-gray-800 pb-2">
+            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+            <span class="text-gray-500 text-xs ml-2 font-sans uppercase tracking-widest">Active Probe Session</span>
+        </div>
+        
+        <div id="terminalContent" class="text-sm space-y-2 text-gray-300">
+            </div>
+    </div>
+
+    <script>
+        async function runPortScan() {
+            const target = document.getElementById('targetIp').value;
+            if (!target) { alert("Please enter a target IP or Domain."); return; }
+
+            const btn = document.getElementById('portScanBtn');
+            const termBox = document.getElementById('terminalBox');
+            const termContent = document.getElementById('terminalContent');
+
+            // Set loading state
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> PROBING...`;
+            btn.disabled = true;
+            termBox.classList.remove('hidden');
+            termContent.innerHTML = `<p class="text-blue-400">> Initiating TCP connect scan on ${target}...</p>`;
+
+            try {
+                // REAL API CALL TO PYTHON BACKEND!
+                const response = await fetch(`http://127.0.0.1:5000/port-scan?target=${encodeURIComponent(target)}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    termContent.innerHTML += `<p class="text-red-500">> Error: ${data.error}</p>`;
+                    return;
+                }
+
+                // Show resolved IP (THIS PROVES IT'S REAL)
+                termContent.innerHTML += `<p class="text-gray-400">> Resolved to IP: <span class="text-white font-bold">${data.target_ip}</span></p>`;
+                termContent.innerHTML += `<p class="text-gray-400">> Probing top critical ports...</p><br>`;
+
+                // Build the results table dynamically
+                let resultsHTML = `
+                    <div class="grid grid-cols-4 gap-4 text-emerald-400 font-bold border-b border-gray-800 pb-1 mb-2">
+                        <span>PORT</span><span>STATE</span><span>SERVICE</span><span>RISK</span>
+                    </div>
+                `;
+
+                data.scan_results.forEach(r => {
+                    resultsHTML += `
+                    <div class="grid grid-cols-4 gap-4 text-gray-300 mb-1">
+                        <span>${r.port}/tcp</span>
+                        <span class="${r.state_color} font-bold">${r.state}</span>
+                        <span>${r.service}</span>
+                        <span class="${r.risk_color}">${r.risk}</span>
+                    </div>
+                    `;
+                });
+
+                resultsHTML += `<br><p class="text-blue-400">> Scan completed successfully.</p>`;
+                termContent.innerHTML += resultsHTML;
+
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                termContent.innerHTML += `<p class="text-red-500">> Failed to reach backend. Is app.py running?</p>`;
+            } finally {
+                btn.innerHTML = `<i class="fa-solid fa-bolt mr-2"></i> PROBE`;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

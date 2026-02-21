@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat Dictionary | SiteSentinel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { 
+            background-color: #0f172a; 
+            background-image: 
+                linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.95)), 
+                url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #f8fafc; 
+            font-family: 'Inter', sans-serif; 
+        }
+        
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; }
+        .glass:hover { border-color: rgba(59, 130, 246, 0.5); transform: translateY(-2px); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center pt-24 pb-12 px-4 relative">
+
+    <nav class="fixed top-0 left-0 w-full bg-slate-900/80 backdrop-blur-md z-50 px-6 py-4 flex justify-between items-center border-b border-slate-700/50">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='index.html'">
+            <i class="fa-solid fa-shield-halved text-blue-500 text-2xl"></i>
+            <span class="text-xl font-bold text-white tracking-wide">Site<span class="text-blue-500">Sentinel</span></span>
+        </div>
+        <div class="flex gap-6 text-sm font-semibold text-slate-300 items-center">
+            <a href="index.html" class="hover:text-blue-400 transition-colors"><i class="fa-solid fa-radar mr-1"></i> Scanner</a>
+            <span class="text-blue-400"><i class="fa-solid fa-book-skull mr-1"></i> Dictionary</span>
+        </div>
+    </nav>
+
+    <div class="text-center max-w-3xl w-full mb-12 space-y-4">
+        <h1 class="text-5xl font-bold tracking-tight text-white">
+            <i class="fa-solid fa-book-skull text-purple-500 mr-3"></i>Threat <span class="text-purple-500">Dictionary</span>
+        </h1>
+        <p class="text-slate-400 text-lg">Understand the critical vulnerabilities and missing headers detected by our security engine.</p>
+    </div>
+
+    <div class="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        <div class="glass rounded-2xl p-8 border-t-4 border-t-red-500">
+            <div class="flex justify-between items-start mb-4">
+                <h2 class="text-2xl font-bold text-white">Clickjacking</h2>
+                <i class="fa-solid fa-hand-pointer text-red-500/20 text-4xl"></i>
+            </div>
+            <div class="mb-4">
+                <span class="bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-1 rounded text-xs font-mono">Missing: X-Frame-Options</span>
+            </div>
+            <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                An attacker uses transparent or opaque layers to trick a user into clicking on a button or link on another page when they were intending to click on the top-level page.
+            </p>
+            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 text-sm">
+                <span class="text-emerald-400 font-bold block mb-1">The Fix:</span>
+                <span class="text-slate-400">Configure your server to send the <code class="text-blue-300 bg-slate-900 px-1 rounded">X-Frame-Options: DENY</code> header to prevent your site from being embedded in malicious iframes.</span>
+            </div>
+        </div>
+
+        <div class="glass rounded-2xl p-8 border-t-4 border-t-yellow-500">
+            <div class="flex justify-between items-start mb-4">
+                <h2 class="text-2xl font-bold text-white">Cross-Site Scripting (XSS)</h2>
+                <i class="fa-solid fa-code text-yellow-500/20 text-4xl"></i>
+            </div>
+            <div class="mb-4">
+                <span class="bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-2 py-1 rounded text-xs font-mono">Missing: Content-Security-Policy</span>
+            </div>
+            <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                XSS allows attackers to inject malicious scripts into the web pages viewed by other users. This can lead to stolen session cookies, hijacked accounts, and defaced websites.
+            </p>
+            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 text-sm">
+                <span class="text-emerald-400 font-bold block mb-1">The Fix:</span>
+                <span class="text-slate-400">Implement a robust <code class="text-blue-300 bg-slate-900 px-1 rounded">Content-Security-Policy (CSP)</code> header that restricts where scripts can be loaded and executed from.</span>
+            </div>
+        </div>
+
+        <div class="glass rounded-2xl p-8 border-t-4 border-t-orange-500">
+            <div class="flex justify-between items-start mb-4">
+                <h2 class="text-2xl font-bold text-white">Protocol Downgrade (MITM)</h2>
+                <i class="fa-solid fa-user-secret text-orange-500/20 text-4xl"></i>
+            </div>
+            <div class="mb-4">
+                <span class="bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2 py-1 rounded text-xs font-mono">Missing: Strict-Transport-Security</span>
+            </div>
+            <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                A Man-In-The-Middle (MITM) attacker forces the user's browser to connect over insecure HTTP instead of secure HTTPS, allowing them to intercept passwords and sensitive data.
+            </p>
+            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 text-sm">
+                <span class="text-emerald-400 font-bold block mb-1">The Fix:</span>
+                <span class="text-slate-400">Enable <code class="text-blue-300 bg-slate-900 px-1 rounded">Strict-Transport-Security (HSTS)</code> to force browsers to only connect via HTTPS, even if the user types 'http://'.</span>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
